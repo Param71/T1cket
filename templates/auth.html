@@ -159,6 +159,55 @@
 
 .flash-wrapper { position: absolute; top: 16px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; flex-direction: column; gap: 8px; }
 .flash-item { background: var(--flash-bg); color: var(--flash-text); padding: 12px 24px; border-radius: 30px; font-size: 13px; font-weight: 500; }
+
+/* ===== Auth Responsive ===== */
+@media (max-width: 768px) {
+    .auth-wrapper, .auth-container {
+        height: auto !important;
+        min-height: 500px;
+    }
+    .form-area {
+        position: relative !important;
+        height: auto !important;
+        width: 100% !important;
+        opacity: 0;
+        display: none;
+    }
+    .sign-in-container, .sign-up-container {
+        position: relative !important;
+        width: 100% !important;
+        left: 0 !important;
+        transform: none !important;
+    }
+    .auth-container:not(.right-panel-active) .sign-in-container {
+        display: block;
+        opacity: 1;
+        z-index: 2;
+    }
+    .auth-container.right-panel-active .sign-up-container {
+        display: block;
+        opacity: 1;
+        z-index: 2;
+    }
+    .auth-container.right-panel-active .sign-in-container {
+        display: none;
+        opacity: 0;
+    }
+    .overlay-container { display: none !important; }
+    
+    .auth-form-content {
+        padding: 40px 10%;
+        height: auto !important;
+    }
+    .form-title { font-size: 24px !important; }
+    .form-subtitle { font-size: 13px !important; margin-bottom: 24px !important; }
+    .auth-input { font-size: 14px; padding: 12px 14px; }
+    .auth-input-group { margin-bottom: 14px; }
+}
+@media (max-width: 480px) {
+    .auth-form-content { padding: 40px 16px; }
+    .form-title { font-size: 20px !important; }
+}
 </style>
 {% endblock %}
 
@@ -189,7 +238,7 @@
                         </div>
                         <div class="auth-input-group" style="margin-bottom: 16px;">
                             <label>Email & Username</label>
-                            <div style="display: flex; gap: 12px;">
+                            <div style="display: flex; gap: 12px; flex-wrap: wrap;">
                                 <input type="email" name="email" class="auth-input" placeholder="Email" required autocomplete="off">
                                 <input type="text" name="username" class="auth-input" placeholder="Username" required autocomplete="off">
                             </div>

@@ -64,6 +64,27 @@
     margin-bottom: 24px;
     font-family: 'Syncopate', sans-serif;
 }
+
+/* ===== Profile Responsive ===== */
+@media (max-width: 768px) {
+    .profile-container {
+        padding: 32px 24px;
+        margin: 20px auto;
+        border-radius: 24px;
+    }
+    .profile-header h1 { font-size: 24px; }
+    .info-grid { grid-template-columns: 1fr; gap: 20px; }
+    .avatar-placeholder { width: 72px; height: 72px; font-size: 24px; }
+}
+@media (max-width: 480px) {
+    .profile-container {
+        padding: 24px 16px;
+        margin: 12px auto;
+        border-radius: 20px;
+    }
+    .profile-header h1 { font-size: 20px; }
+    .avatar-placeholder { width: 56px; height: 56px; font-size: 20px; margin-bottom: 16px; }
+}
 </style>
 {% endblock %}
 

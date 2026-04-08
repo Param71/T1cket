@@ -390,3 +390,257 @@ body {
     padding-right: 16px;
     margin-right: 8px;
 }
+
+/* ===== MOBILE HAMBURGER MENU ===== */
+.mobile-menu-toggle {
+    display: none;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 22px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    z-index: 1001;
+}
+.mobile-menu-toggle:hover { background: rgba(128,128,128,0.1); }
+
+.mobile-nav-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--frame-bg);
+    z-index: 999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+}
+.mobile-nav-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+}
+.mobile-nav-overlay a {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-family: 'Syncopate', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 12px 32px;
+    border-radius: 16px;
+    transition: background 0.2s;
+}
+.mobile-nav-overlay a:hover { background: rgba(128,128,128,0.1); }
+.mobile-nav-close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 28px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.mobile-nav-close:hover { background: rgba(128,128,128,0.1); }
+
+/* ===== TOUCH DEVICE — disable custom cursor ===== */
+@media (hover: none) and (pointer: coarse) {
+    * { cursor: auto !important; }
+    .custom-cursor { display: none !important; }
+}
+
+/* ===== RESPONSIVE: TABLETS (≤1024px) ===== */
+@media (max-width: 1024px) {
+    body { overflow: auto; }
+
+    .ui-frame {
+        border-radius: 24px;
+        width: 98vw;
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .hero-headline {
+        font-size: 3.5rem;
+        left: 40px;
+        bottom: 30px;
+    }
+
+    .bottom-right-cutout {
+        width: 260px;
+        height: 220px;
+    }
+
+    .annotation.top-left { top: 20%; left: 10%; }
+    .annotation.mid-right { top: 40%; right: 15%; }
+    .annotation.bottom-right { bottom: 20%; right: 18%; }
+
+    .split-layout { flex-direction: column; }
+    .split-left { min-height: 40vh; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .split-right { border-top-left-radius: 32px; border-top-right-radius: 32px; border-bottom-left-radius: 0; }
+
+    #live-clock { display: none; }
+}
+
+/* ===== RESPONSIVE: SMALL TABLETS & LARGE PHONES (≤768px) ===== */
+@media (max-width: 768px) {
+    body { overflow: auto; }
+
+    .ui-frame {
+        border-radius: 0;
+        width: 100vw;
+        height: auto;
+        min-height: 100vh;
+        padding: 8px;
+        gap: 8px;
+        box-shadow: none;
+    }
+
+    .main-bento-hero {
+        border-radius: 20px;
+    }
+
+    /* Header adjustments */
+    .header {
+        padding: 0 8px;
+        height: 56px;
+    }
+    .logo { font-size: 18px; letter-spacing: 1px; }
+    .center-menu { display: none; }
+    .mobile-menu-toggle { display: flex; }
+    .mobile-nav-overlay { display: flex; }
+
+    .header-right {
+        gap: 8px;
+    }
+    .shop-now-btn {
+        padding: 0 16px;
+        height: 44px;
+        font-size: 12px;
+        border-radius: 22px;
+    }
+    .icon-cluster { padding: 4px; gap: 2px; }
+    .icon-btn { width: 36px; height: 36px; font-size: 14px; }
+    .contact-btn { display: none; }
+
+    /* Hero */
+    .hero-headline {
+        font-size: 2.5rem;
+        left: 24px;
+        bottom: 24px;
+    }
+
+    .bottom-right-cutout {
+        width: 200px;
+        height: 180px;
+        border-top-left-radius: 28px;
+    }
+    .bottom-right-cutout::before { width: 30px; height: 30px; top: -30px; box-shadow: 15px 15px 0 15px var(--frame-bg); }
+    .bottom-right-cutout::after { width: 30px; height: 30px; left: -30px; box-shadow: 15px 15px 0 15px var(--frame-bg); }
+
+    .glove-panel { border-radius: 20px; padding: 10px; }
+    .glove-image { border-radius: 14px; }
+
+    /* Annotations */
+    .annotation { font-size: 9px; }
+    .annotation .line { width: 40px; }
+
+    /* Forms */
+    .form-container { padding: 24px; }
+    .form-title { font-size: 24px; }
+
+    /* Scroll content */
+    .scroll-content { padding: 24px; }
+
+    /* Flash messages */
+    .flash-msg {
+        top: 70px;
+        right: 16px;
+        left: 16px;
+        font-size: 13px;
+        padding: 12px 16px;
+    }
+}
+
+/* ===== RESPONSIVE: PHONES (≤480px) ===== */
+@media (max-width: 480px) {
+    .ui-frame {
+        padding: 4px;
+        gap: 4px;
+    }
+
+    .main-bento-hero {
+        border-radius: 16px;
+    }
+
+    .header {
+        padding: 0 4px;
+        height: 48px;
+    }
+    .logo { font-size: 16px; }
+
+    .header-right { gap: 6px; }
+    .shop-now-btn {
+        padding: 0 12px;
+        height: 38px;
+        font-size: 11px;
+        border-radius: 20px;
+    }
+    .icon-cluster { border-radius: 20px; }
+    .icon-btn { width: 32px; height: 32px; font-size: 12px; }
+
+    /* Hero */
+    .hero-headline {
+        font-size: 1.8rem;
+        left: 16px;
+        bottom: 16px;
+    }
+
+    .bottom-right-cutout {
+        width: 150px;
+        height: 140px;
+        border-top-left-radius: 20px;
+        padding-top: 10px;
+        padding-left: 10px;
+    }
+    .bottom-right-cutout::before { width: 20px; height: 20px; top: -20px; box-shadow: 10px 10px 0 10px var(--frame-bg); }
+    .bottom-right-cutout::after { width: 20px; height: 20px; left: -20px; box-shadow: 10px 10px 0 10px var(--frame-bg); }
+
+    .glove-panel { padding: 8px; border-radius: 14px; }
+    .glove-image { border-radius: 10px; margin-bottom: 8px; }
+    .nav-arrow { width: 32px; height: 32px; font-size: 12px; }
+
+    /* Annotations — hide on very small screens */
+    .annotation { display: none; }
+
+    /* Forms */
+    .form-container { padding: 16px; max-width: 100%; }
+    .form-title { font-size: 20px; }
+    .form-subtitle { margin-bottom: 24px; }
+
+    /* Scroll content */
+    .scroll-content { padding: 16px; }
+
+    .flash-msg {
+        top: 60px;
+        right: 8px;
+        left: 8px;
+        border-radius: 16px;
+    }
+}

@@ -68,6 +68,44 @@
 <style>
 .draggable { cursor: grab; user-select: none; }
 .draggable:active { cursor: grabbing; }
+
+/* ===== About Page Responsive ===== */
+@media (max-width: 768px) {
+    .hero-headline { font-size: 2rem !important; left: 24px !important; bottom: 20px !important; }
+    .annotation.top-left { top: 10% !important; left: 5% !important; }
+    .annotation.mid-right { top: 15% !important; right: 5% !important; }
+    .draggable[style*="bottom: 25%"] {
+        bottom: auto !important;
+        top: 50% !important;
+        left: 16px !important;
+        right: 16px !important;
+        max-width: 100% !important;
+        padding: 20px !important;
+        flex-direction: column !important;
+    }
+    .draggable[style*="bottom: 25%"] div[style*="width: 120px"] {
+        width: 80px !important;
+        height: 80px !important;
+    }
+    /* Hide secondary floating images */
+    .annotation.mid-right,
+    .draggable[style*="bottom: 35%"] { display: none !important; }
+    /* Designed-by cutout */
+    div[style*="width: 140px"][style*="height: 110px"] {
+        width: 100px !important;
+        height: 80px !important;
+    }
+}
+@media (max-width: 480px) {
+    .hero-headline { font-size: 1.6rem !important; left: 16px !important; bottom: 16px !important; }
+    .annotation.top-left { display: none !important; }
+    .draggable[style*="bottom: 25%"] {
+        padding: 16px !important;
+        gap: 12px !important;
+    }
+    .draggable[style*="bottom: 25%"] h1 { font-size: 18px !important; }
+    .draggable[style*="bottom: 25%"] p { font-size: 10px !important; }
+}
 </style>
 <script>
 document.querySelectorAll('.draggable').forEach(el => {

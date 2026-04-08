@@ -68,6 +68,43 @@
 .fare-row .value { font-size: 28px; font-family: 'Syncopate', sans-serif; font-weight: 700; }
 
 .booking-form { margin-top: 40px; }
+
+/* ===== Booking Responsive ===== */
+@media (max-width: 1000px) {
+    .booking-grid { grid-template-columns: 1fr; }
+    .summary-panel { position: static; }
+}
+@media (max-width: 768px) {
+    .train-info-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    .train-info-header h1 { font-size: 24px; }
+    .train-info-header div[style*="text-align: right"] { text-align: left !important; }
+    .class-tabs { flex-wrap: wrap; }
+    .class-tab { padding: 8px 16px; font-size: 9px; }
+    .seat-map-container { padding: 20px; border-radius: 20px; }
+    .legend { flex-wrap: wrap; gap: 12px; }
+    .berth-bay { flex-wrap: wrap; gap: 4px; }
+    .seat { min-width: 36px; font-size: 10px; }
+    .seat .seat-num { font-size: 10px; }
+    .seat .berth-type { font-size: 7px; }
+    .aisle { width: 16px; font-size: 8px; }
+    .summary-panel { padding: 24px; border-radius: 24px; }
+    .summary-title { font-size: 16px; }
+    .fare-row .value { font-size: 22px; }
+}
+@media (max-width: 480px) {
+    .train-info-header h1 { font-size: 20px; }
+    .seat-map-container { padding: 12px; border-radius: 16px; }
+    .coach-label { font-size: 12px; margin-bottom: 16px; }
+    .berth-group { grid-template-columns: repeat(3, 1fr); gap: 3px; }
+    .berth-group-side { grid-template-columns: repeat(2, 1fr); gap: 3px; }
+    .seat { min-width: 30px; }
+    .aisle { width: 8px; font-size: 1px; color: transparent; }
+    .summary-panel { padding: 16px; border-radius: 20px; }
+}
 </style>
 {% endblock %}
 

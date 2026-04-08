@@ -42,6 +42,50 @@
 .qr-placeholder { border: 4px solid var(--text-primary); padding: 8px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: auto;}
 .pnr { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; letter-spacing: 3px; margin-top: 24px; text-align: center; }
 .empty-state { text-align: center; color: var(--text-secondary); padding: 60px; font-size: 13px; border: 1px dashed rgba(128,128,128,0.2); border-radius: 32px; margin-top: 32px; }
+
+/* ===== Dashboard Responsive ===== */
+@media (max-width: 768px) {
+    .ticket-grid { grid-template-columns: 1fr !important; }
+    .ticket-card { flex-direction: column; }
+    .ticket-left {
+        border-right: none;
+        border-bottom: 2px dashed var(--input-border);
+        padding: 24px;
+    }
+    .ticket-left::before,
+    .ticket-left::after {
+        /* Move notches to bottom edge */
+        right: auto;
+        bottom: -12px;
+        width: 24px;
+        height: 24px;
+    }
+    .ticket-left::before { top: auto; bottom: -12px; left: -12px; }
+    .ticket-left::after { bottom: -12px; right: -12px; left: auto; }
+    .ticket-right {
+        width: 100%;
+        padding: 24px;
+        flex-direction: row;
+        align-items: center;
+        gap: 24px;
+    }
+    .qr-placeholder { width: 60px; height: 60px; font-size: 24px; margin-bottom: 0; }
+    .pnr { margin-top: 8px; }
+    .t-route { gap: 12px; }
+    .city { font-size: 22px; }
+    .t-details { grid-template-columns: repeat(2, 1fr); }
+    .dashboard-header h1 { font-size: 24px; }
+}
+@media (max-width: 480px) {
+    .ticket-left { padding: 16px; }
+    .ticket-right { padding: 16px; }
+    .city { font-size: 18px; }
+    .t-header { flex-direction: column; gap: 8px; align-items: flex-start; }
+    .t-details { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .dashboard-header h1 { font-size: 20px; }
+    .empty-state { padding: 32px; border-radius: 20px; }
+    .empty-state h2 { font-size: 18px !important; }
+}
 </style>
 {% endblock %}
 

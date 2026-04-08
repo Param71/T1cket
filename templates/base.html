@@ -26,6 +26,11 @@
     <header class="header">
         <a href="{{ url_for('index') }}" class="logo" style="text-decoration:none;">T!CKET</a>
         
+        <!-- Mobile hamburger button (visible ≤768px via CSS) -->
+        <button class="mobile-menu-toggle" id="mobileMenuToggle" aria-label="Open menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
         <nav class="center-menu">
             {% if session.user_id %}
               <a href="{{ url_for('profile') }}" style="text-transform: uppercase;">{{ session.username }} <i class="fa-regular fa-user" style="margin-left:4px;"></i></a>
@@ -50,6 +55,24 @@
         </div>
     </header>
 
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay">
+        <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close menu">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+        <a href="{{ url_for('index') }}">Home</a>
+        <a href="{{ url_for('search') }}">Search Trains</a>
+        <a href="{{ url_for('about') }}">About</a>
+        {% if session.user_id %}
+            <a href="{{ url_for('profile') }}">{{ session.username }}</a>
+            <a href="{{ url_for('dashboard') }}">My Tickets</a>
+            {% if session.username == 'admin' %}<a href="{{ url_for('admin_dashboard') }}" style="color:#ff6b35;">Admin</a>{% endif %}
+            <a href="{{ url_for('logout') }}">Logout</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Login / Register</a>
+        {% endif %}
+    </div>
+
     <!-- Flash Messages -->
     {% with messages = get_flashed_messages() %}
       {% if messages %}
@@ -66,6 +89,29 @@
 
   {% block extra_scripts %}{% endblock %}
   <script>
+    // Mobile Menu Toggle
+    const mobileToggle = document.getElementById('mobileMenuToggle');
+    const mobileOverlay = document.getElementById('mobileNavOverlay');
+    const mobileClose = document.getElementById('mobileNavClose');
+    if (mobileToggle && mobileOverlay) {
+        mobileToggle.addEventListener('click', () => {
+            mobileOverlay.classList.add('open');
+            document.body.style.overflow = 'hidden';
+        });
+        mobileClose.addEventListener('click', () => {
+            mobileOverlay.classList.remove('open');
+            document.body.style.overflow = '';
+        });
+        // Close on link click
+        mobileOverlay.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+            });
+        });
+    }
+
+    // Theme Toggle
     const themeToggleBtn = document.getElementById('theme-toggle');
     if (themeToggleBtn) {
         const themeIcon = themeToggleBtn.querySelector('i');
@@ -103,9 +149,10 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Custom Cursor Logic
+    // Custom Cursor Logic — skip on touch devices
+    const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     const cursor = document.getElementById('custom-cursor');
-    if (cursor) {
+    if (cursor && !isTouchDevice) {
       document.addEventListener('mousemove', e => {
         cursor.style.left = e.clientX + 'px';
         cursor.style.top = e.clientY + 'px';
@@ -114,6 +161,8 @@
         el.addEventListener('mouseenter', () => cursor.classList.add('active'));
         el.addEventListener('mouseleave', () => cursor.classList.remove('active'));
       });
+    } else if (cursor && isTouchDevice) {
+      cursor.style.display = 'none';
     }
   </script>
 </body>
