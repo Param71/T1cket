@@ -7,6 +7,11 @@ import hashlib
 
 load_dotenv()
 
+# Run database initialization on startup
+from init_db import init_db
+print("Cloud Startup: Triggering automatic database initialization...")
+init_db()
+
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY', 't1cket_secret_2024')
 

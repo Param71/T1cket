@@ -1,1 +1,1 @@
-web: python init_db.py && gunicorn app:app --log-level debug
+web: gunicorn app:app --log-level debug --timeout 120
