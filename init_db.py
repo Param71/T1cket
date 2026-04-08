@@ -224,8 +224,9 @@ def init_db():
         print("Database initialized successfully.")
     
     except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        print("Please check your MySQL configuration in .env and make sure the server is running!")
+        print(f"FATAL ERROR during initialization: {err}")
+        # Re-raise the error so the deployment fails and we see it in logs
+        raise err
     finally:
         if 'c' in locals():
             c.close()
