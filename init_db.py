@@ -9,12 +9,14 @@ load_dotenv()
 def init_db():
     print("Connecting to MySQL server...")
     try:
-        # Initial connection using Railway fallbacks
+        # Initial connection using flexible fallbacks
         host = os.getenv('MYSQLHOST', os.getenv('DB_HOST', 'localhost'))
         user = os.getenv('MYSQLUSER', os.getenv('DB_USER', 'root'))
         password = os.getenv('MYSQLPASSWORD', os.getenv('DB_PASSWORD', ''))
         port = int(os.getenv('MYSQLPORT', 3306))
-        db_name = os.getenv('MYSQLDATABASE', os.getenv('DB_NAME', 't1cket'))
+        
+        # Check both database variable names
+        db_name = os.getenv('MYSQLDATABASE', os.getenv('MYSQL_DATABASE', os.getenv('DB_NAME', 't1cket')))
 
         conn = mysql.connector.connect(
             host=host,
@@ -24,7 +26,7 @@ def init_db():
         )
         c = conn.cursor()
         
-        print(f"Creating database {db_name} if not exists...")
+        print(f"Ensuring database '{db_name}' exists...")
         c.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
         c.execute(f"USE {db_name};")
         

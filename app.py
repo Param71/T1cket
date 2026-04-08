@@ -12,13 +12,19 @@ app.secret_key = os.getenv('SECRET_KEY', 't1cket_secret_2024')
 
 # ── DB Connection ──────────────────────────────────────────────────────────────
 def get_db(autocommit=True):
-    # Railway Fallbacks: Uses MYSQL* variables if provided, else falls back to local DB_HOST
+    # Railway/Cloud Fallbacks: Detect multiple naming conventions (underscore vs no-underscore)
+    host = os.getenv('MYSQLHOST', os.getenv('DB_HOST', 'localhost'))
+    user = os.getenv('MYSQLUSER', os.getenv('DB_USER', 'root'))
+    password = os.getenv('MYSQLPASSWORD', os.getenv('DB_PASSWORD', ''))
+    database = os.getenv('MYSQLDATABASE', os.getenv('MYSQL_DATABASE', os.getenv('DB_NAME', 't1cket')))
+    port = int(os.getenv('MYSQLPORT', 3306))
+
     conn = mysql.connector.connect(
-        host=os.getenv('MYSQLHOST', os.getenv('DB_HOST', 'localhost')),
-        user=os.getenv('MYSQLUSER', os.getenv('DB_USER', 'root')),
-        password=os.getenv('MYSQLPASSWORD', os.getenv('DB_PASSWORD', '')),
-        database=os.getenv('MYSQLDATABASE', os.getenv('DB_NAME', 't1cket')),
-        port=int(os.getenv('MYSQLPORT', 3306))
+        host=host,
+        user=user,
+        password=password,
+        database=database,
+        port=port
     )
     conn.autocommit = autocommit
     return conn
