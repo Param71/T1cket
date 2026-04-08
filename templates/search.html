@@ -1,0 +1,293 @@
+{% extends "base.html" %}
+{% block title %}Search Trains — T1CKET{% endblock %}
+
+{% block extra_head %}
+<style>
+/* Specific Search UI */
+.search-pill {
+    background: var(--frame-bg);
+    border-radius: 40px;
+    padding: 12px 32px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    margin: 40px auto;
+    width: 100%;
+    max-width: 900px;
+}
+.search-field {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.search-field label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: 600;
+}
+.search-field input, .search-field select {
+    border: none;
+    outline: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: transparent;
+    padding: 4px 0;
+}
+.search-field select option {
+    background-color: var(--frame-bg);
+    color: var(--text-primary);
+}
+.search-submit {
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    transition: background 0.2s;
+}
+.search-submit:hover { opacity: 0.8; }
+
+.divider { width: 1px; height: 30px; background: rgba(128,128,128,0.2); }
+
+/* Train Card */
+.train-card {
+    background: rgba(128,128,128,0.05);
+    border: 1px solid var(--input-border);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 24px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 900px;
+    color: var(--text-primary);
+}
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 32px;
+}
+.train-title {
+    font-family: 'Syncopate', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+.train-badge {
+    background: var(--text-primary);
+    color: var(--frame-bg);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 600;
+    display: inline-block;
+}
+.route-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-align: center;
+}
+.route-time {
+    font-size: 24px;
+    font-weight: 700;
+    font-family: 'Syncopate', sans-serif;
+}
+.route-station {
+    font-size: 10px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+}
+.route-line {
+    width: 40px; height: 1px; background: rgba(255,255,255,0.2);
+    position: relative;
+}
+.route-line::after { content: '>'; position: absolute; right: -4px; top: -7px; font-size: 10px; color: rgba(255,255,255,0.5); }
+
+/* Class Pills */
+.class-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.class-pill {
+    padding: 16px;
+    border: 1px solid var(--input-border);
+    border-radius: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.class-pill:hover, .class-pill.selected {
+    border-color: var(--text-primary);
+    background: rgba(128,128,128,0.1);
+}
+.class-pill .price { font-size: 18px; font-weight: 600; color: var(--text-primary); }
+.class-pill .name { font-size: 10px; text-transform: uppercase; color: var(--text-secondary); margin: 4px 0; letter-spacing: 0.1em; }
+.class-pill .avail { font-size: 11px; color: var(--text-secondary); }
+.class-pill.sold-out { opacity: 0.3; pointer-events: none; }
+
+.book-row {
+    display: flex;
+    justify-content: flex-end;
+}
+.book-btn {
+    background: var(--text-primary);
+    color: var(--frame-bg);
+    padding: 12px 32px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+.book-btn:hover { opacity: 0.8; }
+.no-results { text-align: center; padding: 60px; color: var(--text-secondary); }
+.no-results h3 { font-family: 'Syncopate', sans-serif; font-size: 32px; color: var(--text-primary); margin-bottom: 12px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-bento-hero">
+    <div class="scroll-content">
+        <!-- Search Form -->
+        <form action="/search" method="POST" class="search-pill">
+            <div class="search-field">
+                <label>From</label>
+                <input type="text" name="from_city" placeholder="Mumbai" value="{{ search_params.get('from_city', '') }}" required>
+            </div>
+            <div class="divider"></div>
+            <div class="search-field">
+                <label>To</label>
+                <input type="text" name="to_city" placeholder="New Delhi" value="{{ search_params.get('to_city', '') }}" required>
+            </div>
+            <div class="divider"></div>
+            <div class="search-field" style="cursor: pointer;" onclick="const el=document.getElementById('t_date'); el.focus(); try{el.showPicker();}catch(e){}">
+                <label style="cursor: pointer;">Date</label>
+                <input type="date" id="t_date" name="travel_date" value="{{ search_params.get('travel_date', '') }}" required style="cursor: text;" onclick="event.stopPropagation();">
+            </div>
+            <div class="divider"></div>
+            <div class="search-field">
+                <label>Class</label>
+                <select name="travel_class">
+                    <option value="ALL" {% if search_params.get('travel_class') == 'ALL' %}selected{% endif %}>All Classes</option>
+                    <option value="Sleeper" {% if search_params.get('travel_class') == 'Sleeper' %}selected{% endif %}>Sleeper</option>
+                    <option value="AC3" {% if search_params.get('travel_class') == 'AC3' %}selected{% endif %}>AC 3 Tier</option>
+                    <option value="AC2" {% if search_params.get('travel_class') == 'AC2' %}selected{% endif %}>AC 2 Tier</option>
+                    <option value="AC1" {% if search_params.get('travel_class') == 'AC1' %}selected{% endif %}>AC First Class</option>
+                </select>
+            </div>
+            <button type="submit" class="search-submit"><i class="fa-solid fa-arrow-right"></i></button>
+        </form>
+
+        <!-- Results -->
+        {% if trains %}
+        <div style="max-width: 900px; margin: 0 auto 24px auto; color: #888; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; justify-content: space-between;">
+            <span>{{ trains|length }} Trains Found</span>
+            <span>{{ search_params.get('from_city') }} > {{ search_params.get('to_city') }} on {{ search_params.get('travel_date') }}</span>
+        </div>
+        
+        {% for train in trains %}
+        <div class="train-card">
+            <div class="card-header">
+                <div>
+                    <div class="train-title">{{ train.train_name }}</div>
+                    <div class="train-badge">{{ train.train_type }} · {{ train.train_number }}</div>
+                </div>
+                <div class="route-info">
+                    <div>
+                        <div class="route-time">{{ train.departure_time.strftime('%H:%M') if train.departure_time else '—' }}</div>
+                        <div class="route-station">{{ train.from_station }}</div>
+                    </div>
+                    <div class="route-line"></div>
+                    <div>
+                        <div class="route-time">{{ train.arrival_time.strftime('%H:%M') if train.arrival_time else '—' }}</div>
+                        <div class="route-station">{{ train.to_station }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="class-grid" id="classes-{{ train.schedule_id }}">
+                {% if train.price_sleeper > 0 %}
+                <div class="class-pill" data-class="Sleeper" onclick="selectClass(this, {{ train.schedule_id }})">
+                    <div class="price">₹{{ "%.0f"|format(train.price_sleeper) }}</div>
+                    <div class="name">Sleeper</div>
+                    <div class="avail">{{ train.available_sleeper }} seats</div>
+                </div>
+                {% endif %}
+                {% if train.price_ac3 > 0 %}
+                <div class="class-pill {% if train.available_ac3 == 0 %}sold-out{% endif %}" data-class="AC3" onclick="selectClass(this, {{ train.schedule_id }})">
+                    <div class="price">₹{{ "%.0f"|format(train.price_ac3) }}</div>
+                    <div class="name">AC 3 Tier</div>
+                    <div class="avail">{% if train.available_ac3 == 0 %}Sold Out{% else %}{{ train.available_ac3 }} seats{% endif %}</div>
+                </div>
+                {% endif %}
+                {% if train.price_ac2 > 0 %}
+                <div class="class-pill {% if train.available_ac2 == 0 %}sold-out{% endif %}" data-class="AC2" onclick="selectClass(this, {{ train.schedule_id }})">
+                    <div class="price">₹{{ "%.0f"|format(train.price_ac2) }}</div>
+                    <div class="name">AC 2 Tier</div>
+                    <div class="avail">{% if train.available_ac2 == 0 %}Sold Out{% else %}{{ train.available_ac2 }} seats{% endif %}</div>
+                </div>
+                {% endif %}
+                {% if train.price_ac1 > 0 %}
+                <div class="class-pill {% if train.available_ac1 == 0 %}sold-out{% endif %}" data-class="AC1" onclick="selectClass(this, {{ train.schedule_id }})">
+                    <div class="price">₹{{ "%.0f"|format(train.price_ac1) }}</div>
+                    <div class="name">AC First</div>
+                    <div class="avail">{% if train.available_ac1 == 0 %}Sold Out{% else %}{{ train.available_ac1 }} seats{% endif %}</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="book-row">
+                <a href="/booking/{{ train.schedule_id }}" id="book-btn-{{ train.schedule_id }}" class="book-btn">Select Seat</a>
+            </div>
+        </div>
+        {% endfor %}
+
+        {% elif request.method == 'POST' or search_params %}
+        <div class="no-results">
+            <h3>NO ROUTES</h3>
+            <p>Try searching for a different date or station combination.</p>
+        </div>
+        {% else %}
+        <div class="no-results" style="opacity:0.3; margin-top:100px;">
+            <h3>SEARCH NETWORK</h3>
+            <p>Find real-time seat availability across high-speed rail.</p>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  function selectClass(el, scheduleId) {
+    const group = document.querySelectorAll(`#classes-${scheduleId} .class-pill`);
+    group.forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    const btn = document.getElementById(`book-btn-${scheduleId}`);
+    btn.href = `/booking/${scheduleId}?class=${el.dataset.class}`;
+  }
+  const today = new Date().toISOString().split('T')[0];
+  document.querySelectorAll('input[type="date"]').forEach(inp => { inp.min = today; });
+</script>
+{% endblock %}

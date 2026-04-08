@@ -1,0 +1,96 @@
+{% extends "admin/layout.html" %}
+{% block title %}Manage Tickets — T1CKET Admin{% endblock %}
+
+{% block admin_content %}
+<h1 class="admin-page-title">TICKETS</h1>
+<p class="admin-page-subtitle">View, create and remove booking records</p>
+
+<div class="admin-form">
+    <h3>CREATE TICKET</h3>
+    <form method="POST" action="{{ url_for('admin_add_ticket') }}">
+        <div class="form-row">
+            <div class="field">
+                <label>User</label>
+                <select name="user_id" required>
+                    {% for u in users %}
+                    <option value="{{ u.user_id }}">@{{ u.username }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Schedule</label>
+                <select name="schedule_id" required>
+                    {% for s in schedules %}
+                    <option value="{{ s.schedule_id }}">{{ s.train_number }} {{ s.train_name }} — {{ s.travel_date }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Travel Class</label>
+                <select name="travel_class" required>
+                    <option value="Sleeper">Sleeper</option>
+                    <option value="AC3">AC3</option>
+                    <option value="AC2">AC2</option>
+                    <option value="AC1">AC1</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>Seat Number</label>
+                <input type="number" name="seat_number" min="1" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label>Passenger Name</label>
+                <input type="text" name="passenger_name" placeholder="Full name" required>
+            </div>
+            <div class="field">
+                <label>Passenger Age</label>
+                <input type="number" name="passenger_age" min="1" max="120" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-add">Create Ticket</button>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Train</th>
+                <th>Date</th>
+                <th>Class</th>
+                <th>Seat</th>
+                <th>Passenger</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for tk in tickets %}
+            <tr>
+                <td>{{ tk.booking_id }}</td>
+                <td>@{{ tk.username }}</td>
+                <td>{{ tk.train_number }} {{ tk.train_name }}</td>
+                <td>{{ tk.travel_date }}</td>
+                <td>{{ tk.travel_class }}</td>
+                <td style="font-weight:700;">{{ tk.seat_number }}</td>
+                <td>{{ tk.passenger_name }} ({{ tk.passenger_age }})</td>
+                <td>₹{{ "%.0f"|format(tk.price_paid) }}</td>
+                <td><span class="status-badge {{ tk.status }}">{{ tk.status }}</span></td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin_delete_ticket', booking_id=tk.booking_id) }}" style="display:inline;" onsubmit="return confirm('Permanently delete this ticket?');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="10" class="empty-msg">No tickets found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

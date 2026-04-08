@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<main class="main-bento-hero">
+    <div class="home-bg" style="background-image: url('{{ url_for('static', filename='images/train.png') }}');"></div>
+
+    <div class="annotation top-left">
+        <div class="text">
+            <span class="title">Tickets Starting at</span><br>
+            <span class="price">1000rs</span>
+        </div>
+        <div class="line-container">
+            <div class="line"></div>
+            <div class="dot"></div>
+        </div>
+    </div>
+
+    <div class="annotation mid-right right-side">
+        <div class="line-container left-dot">
+            <div class="dot"></div>
+            <div class="line"></div>
+        </div>
+        <div class="text">
+            <span class="title">Rajdhani</span><br>
+            <span class="price">2000rs</span>
+        </div>
+    </div>
+
+    <div class="annotation bottom-right right-side">
+        <div class="line-container left-dot">
+            <div class="dot"></div>
+            <div class="line"></div>
+        </div>
+        <div class="text">
+            <span class="title">Maharajas’ Express</span><br>
+            <span class="price">4500rs</span>
+        </div>
+    </div>
+
+    <h1 class="hero-headline">
+        TRAVEL,<br>STYLISH
+    </h1>
+
+    <div class="bottom-right-cutout">
+        <div class="glove-panel">
+            <div class="glove-image" style="background-image: url('{{ url_for('static', filename='images/image_05.png') }}');"></div>
+            <div class="glove-footer">
+                <button class="nav-arrow" onclick="window.location.href='/search'"><i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}

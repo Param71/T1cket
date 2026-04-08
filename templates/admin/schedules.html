@@ -1,0 +1,97 @@
+{% extends "admin/layout.html" %}
+{% block title %}Manage Schedules — T1CKET Admin{% endblock %}
+
+{% block admin_content %}
+<h1 class="admin-page-title">SCHEDULES</h1>
+<p class="admin-page-subtitle">Manage train dates, timings, and pricing</p>
+
+<div class="admin-form">
+    <h3>ADD NEW SCHEDULE</h3>
+    <form method="POST" action="{{ url_for('admin_add_schedule') }}">
+        <div class="form-row">
+            <div class="field">
+                <label>Train</label>
+                <select name="train_id" required>
+                    {% for t in trains %}
+                    <option value="{{ t.train_id }}">{{ t.train_number }} — {{ t.train_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label>Travel Date</label>
+                <input type="date" name="travel_date" required>
+            </div>
+            <div class="field">
+                <label>Departure Time</label>
+                <input type="time" name="departure_time" required>
+            </div>
+            <div class="field">
+                <label>Arrival Time</label>
+                <input type="time" name="arrival_time" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="field">
+                <label>Price (Sleeper)</label>
+                <input type="number" name="price_sl" placeholder="₹" step="0.01" required>
+            </div>
+            <div class="field">
+                <label>Price (AC3)</label>
+                <input type="number" name="price_3ac" placeholder="₹" step="0.01" required>
+            </div>
+            <div class="field">
+                <label>Price (AC2)</label>
+                <input type="number" name="price_2ac" placeholder="₹" step="0.01" required>
+            </div>
+            <div class="field">
+                <label>Price (AC1)</label>
+                <input type="number" name="price_1ac" placeholder="₹" step="0.01" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-add">Add Schedule</button>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Train</th>
+                <th>Date</th>
+                <th>Dep</th>
+                <th>Arr</th>
+                <th>SL</th>
+                <th>3AC</th>
+                <th>2AC</th>
+                <th>1AC</th>
+                <th>Seats Left</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in schedules %}
+            <tr>
+                <td>{{ s.schedule_id }}</td>
+                <td>{{ s.train_number }} {{ s.train_name }}</td>
+                <td>{{ s.travel_date }}</td>
+                <td>{{ s.departure_time }}</td>
+                <td>{{ s.arrival_time }}</td>
+                <td>₹{{ "%.0f"|format(s.price_sl) }}</td>
+                <td>₹{{ "%.0f"|format(s.price_3ac) }}</td>
+                <td>₹{{ "%.0f"|format(s.price_2ac) }}</td>
+                <td>₹{{ "%.0f"|format(s.price_1ac) }}</td>
+                <td style="font-size:11px;">SL:{{ s.available_sleeper }} 3A:{{ s.available_ac3 }} 2A:{{ s.available_ac2 }} 1A:{{ s.available_ac1 }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin_delete_schedule', schedule_id=s.schedule_id) }}" style="display:inline;" onsubmit="return confirm('Delete this schedule? All bookings will be removed.');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="11" class="empty-msg">No schedules found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

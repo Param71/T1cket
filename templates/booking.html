@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+{% block title %}Select Seat — T1CKET{% endblock %}
+
+{% block extra_head %}
+<style>
+.booking-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 40px;
+}
+@media (max-width: 1000px) { .booking-grid { grid-template-columns: 1fr; } }
+.train-info-header {
+    margin-bottom: 32px;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+.train-info-header h1 { font-family: 'Syncopate', sans-serif; font-size: 32px; font-weight: 700; margin-bottom: 8px; letter-spacing: -1px; }
+.train-info-header .route { font-size: 11px; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
+
+.class-tabs { display: flex; gap: 8px; margin-bottom: 24px; }
+.class-tab {
+    background: transparent; color: var(--text-secondary); border: 1px solid var(--input-border);
+    padding: 10px 24px; border-radius: 30px; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.1em; cursor: pointer; transition: all 0.2s; font-weight: 600;
+}
+.class-tab.active, .class-tab:hover { background: var(--text-primary); color: var(--frame-bg); border-color: var(--text-primary); }
+
+.seat-map-container {
+    background: rgba(128,128,128,0.02); border: 1px solid var(--input-border);
+    border-radius: 32px; padding: 40px;
+}
+.legend {
+    display: flex; gap: 24px; margin-bottom: 40px; font-size: 10px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600;
+}
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot-avail { border: 1px solid var(--input-border); }
+.dot-sel { background: var(--text-primary); }
+.dot-booked { background: #333; border: 1px solid #222; }
+
+.coach-label { font-family: 'Syncopate', sans-serif; font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 32px; letter-spacing: 0.1em; }
+.berth-bay { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
+.berth-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; flex: 3; }
+.berth-group-side { display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px; flex: 2; }
+.aisle { width: 32px; text-align: center; font-size: 10px; color: var(--text-secondary); flex-shrink: 0; }
+.seat {
+    aspect-ratio: 1.4; border: 1px solid var(--input-border); border-radius: 8px; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; background: transparent;
+    font-size: 11px; color: var(--text-secondary); min-width: 44px;
+}
+.seat:hover:not(.booked):not(.selected) { background: rgba(128,128,128,0.1); border-color: var(--text-primary); color: var(--text-primary); }
+.seat.selected { background: var(--text-primary); border-color: var(--text-primary); color: var(--frame-bg); }
+.seat.booked { background: #222; border-color: #222; color: #555; cursor: not-allowed; }
+.seat .seat-num { font-weight: 600; font-size: 12px; }
+.seat .berth-type { font-size: 8px; opacity: 0.7; margin-top: 2px; text-transform: uppercase; }
+
+/* Summary Panel */
+.summary-panel {
+    background: var(--frame-bg); color: var(--text-primary); border-radius: 32px; padding: 40px; position: sticky; top: 0; border: 1px solid var(--input-border);
+}
+.summary-title { font-family: 'Syncopate', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 24px; letter-spacing: -0.5px; }
+.summary-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; font-size: 14px; font-weight: 500; border-bottom: 1px solid var(--input-border); padding-bottom: 12px; }
+.summary-row .label { color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; font-size: 10px; font-weight: 600; display: block; margin-bottom: 4px; }
+.summary-row .value { font-weight: 600; text-align: right; }
+.fare-row { border-bottom: none; padding-bottom: 0; margin-top: 24px; align-items: center; }
+.fare-row .value { font-size: 28px; font-family: 'Syncopate', sans-serif; font-weight: 700; }
+
+.booking-form { margin-top: 40px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-bento-hero">
+    <div class="scroll-content">
+        <div class="train-info-header">
+            <div>
+                <h1>{{ schedule.train_name }}</h1>
+                <div class="route">{{ schedule.train_number }} · {{ schedule.train_type }}</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-family: 'Syncopate', sans-serif; font-size: 24px; font-weight: 700; color: var(--text-primary);">{{ schedule.departure_time }} <span style="font-family:'Inter', sans-serif;font-size:12px;color:var(--text-secondary);">to</span> {{ schedule.arrival_time }}</div>
+                <div class="route">{{ schedule.from_station }} ➔ {{ schedule.to_station }} on {{ schedule.travel_date }}</div>
+            </div>
+        </div>
+
+        <div class="booking-grid">
+            <!-- SEAT MAP SIDE -->
+            <div>
+                <div class="class-tabs">
+                    {% if schedule.price_sleeper > 0 %}
+                    <button class="class-tab {% if selected_class == 'Sleeper' or not selected_class %}active{% endif %}" onclick="switchClass('Sleeper', {{ schedule.price_sleeper }})">Sleeper</button>
+                    {% endif %}
+                    {% if schedule.price_ac3 > 0 %}
+                    <button class="class-tab {% if selected_class == 'AC3' %}active{% endif %}" onclick="switchClass('AC3', {{ schedule.price_ac3 }})">AC 3 Tier</button>
+                    {% endif %}
+                    {% if schedule.price_ac2 > 0 %}
+                    <button class="class-tab {% if selected_class == 'AC2' %}active{% endif %}" onclick="switchClass('AC2', {{ schedule.price_ac2 }})">AC 2 Tier</button>
+                    {% endif %}
+                    {% if schedule.price_ac1 > 0 %}
+                    <button class="class-tab {% if selected_class == 'AC1' %}active{% endif %}" onclick="switchClass('AC1', {{ schedule.price_ac1 }})">AC First</button>
+                    {% endif %}
+                </div>
+
+                <div class="seat-map-container">
+                    <div class="legend">
+                        <div class="legend-item"><div class="legend-dot dot-avail"></div> Available</div>
+                        <div class="legend-item"><div class="legend-dot dot-sel"></div> Selected</div>
+                        <div class="legend-item"><div class="legend-dot dot-booked"></div> Booked</div>
+                    </div>
+                    
+                    <div class="coach-label">COACH B1 — <span id="current-class-label"></span></div>
+                    <div id="seat-map"></div>
+                </div>
+            </div>
+
+            <!-- SUMMARY PANEL -->
+            <div>
+                <div class="summary-panel">
+                    <div class="summary-title">BOOKING</div>
+                    
+                    <div class="summary-row">
+                        <div class="label">Date</div>
+                        <div class="value">{{ schedule.travel_date }}</div>
+                    </div>
+                    <div class="summary-row">
+                        <div class="label">Seat</div>
+                        <div class="value" id="sum-seat" style="color: var(--text-secondary);">Select a seat</div>
+                    </div>
+                    <div class="summary-row">
+                        <div class="label">Class</div>
+                        <div class="value" id="sum-class">—</div>
+                    </div>
+                    <div class="summary-row fare-row">
+                        <div class="label">Fare</div>
+                        <div class="value" id="sum-price">₹—</div>
+                    </div>
+
+                    <form action="/confirm_booking" method="POST" id="bookingForm" class="booking-form" onsubmit="return validateForm()">
+                        <input type="hidden" name="schedule_id" value="{{ schedule.schedule_id }}">
+                        <input type="hidden" name="seat_number" id="seat_input" value="">
+                        <input type="hidden" name="travel_class" id="class_input" value="">
+                        
+                        <div class="input-group">
+                            <label style="color:var(--text-secondary);">Passenger Name</label>
+                            <input type="text" name="passenger_name" required autocomplete="off" style="border-bottom-color:var(--input-border); color:var(--text-primary);">
+                        </div>
+                        <div class="input-group">
+                            <label style="color:var(--text-secondary);">Age</label>
+                            <input type="number" name="passenger_age" required min="1" max="120" style="border-bottom-color:var(--input-border); color:var(--text-primary);">
+                        </div>
+
+                        <button type="submit" class="dark-btn" style="margin-top: 40px;">CONFIRM BOOKING</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  const bookedSeats = new Set({{ booked_seats | tojson }}.map(b => b[1] + '-' + b[0]));
+  const classPrices = {
+    'Sleeper': {{ schedule.price_sleeper or 0 }},
+    'AC3':     {{ schedule.price_ac3 or 0 }},
+    'AC2':     {{ schedule.price_ac2 or 0 }},
+    'AC1':     {{ schedule.price_ac1 or 0 }},
+  };
+  
+  let currentClass = '{{ selected_class or "Sleeper" }}';
+  let selectedSeat = null;
+  const SLEEPER_BERTHS = ['LB','MB','UB','LB','MB','UB','SL','SU'];
+  const AC_BERTHS = ['LB','MB','UB','LB','MB','UB','SL','SU'];
+
+  function buildSeatMap(cls) {
+    const map = document.getElementById('seat-map');
+    map.innerHTML = '';
+    const berthTypes = cls === 'Sleeper' ? SLEEPER_BERTHS : AC_BERTHS;
+    const total = cls === 'AC1' ? 18 : cls === 'AC2' ? 46 : cls === 'AC3' ? 64 : 72;
+    const bays = Math.ceil(total / 8);
+
+    for (let bay = 0; bay < bays; bay++) {
+      const bayDiv = document.createElement('div');
+      bayDiv.className = 'berth-bay';
+      const leftGrp = document.createElement('div'); leftGrp.className = 'berth-group';
+      const rightGrp = document.createElement('div'); rightGrp.className = 'berth-group';
+      const sideGrp = document.createElement('div'); sideGrp.className = 'berth-group-side';
+      const aisle = document.createElement('div'); aisle.className = 'aisle'; aisle.textContent = '│';
+      const aisle2 = document.createElement('div'); aisle2.className = 'aisle'; aisle2.textContent = '│';
+
+      for (let pos = 0; pos < 8; pos++) {
+        const seatNum = bay * 8 + pos + 1;
+        if (seatNum > total) break;
+        const berth = berthTypes[pos];
+        const isBooked = bookedSeats.has(cls + '-' + seatNum);
+
+        const seat = document.createElement('div');
+        seat.className = 'seat' + (isBooked ? ' booked' : '');
+        seat.innerHTML = `<span class="seat-num">${seatNum}</span><span class="berth-type">${berth}</span>`;
+        if (!isBooked) {
+          seat.addEventListener('click', () => selectSeat(seat, seatNum, cls));
+        }
+
+        if (pos < 3) leftGrp.appendChild(seat);
+        else if (pos < 6) rightGrp.appendChild(seat);
+        else sideGrp.appendChild(seat);
+      }
+      bayDiv.appendChild(leftGrp); bayDiv.appendChild(aisle);
+      bayDiv.appendChild(rightGrp); bayDiv.appendChild(aisle2);
+      bayDiv.appendChild(sideGrp);
+      map.appendChild(bayDiv);
+    }
+  }
+
+  function selectSeat(el, seatNum, cls) {
+    document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedSeat = seatNum;
+    document.getElementById('seat_input').value = seatNum;
+    document.getElementById('class_input').value = cls;
+    document.getElementById('sum-seat').textContent = 'Seat ' + seatNum;
+    document.getElementById('sum-seat').style.color = 'var(--text-primary)';
+  }
+
+  function switchClass(cls, price) {
+    currentClass = cls;
+    selectedSeat = null;
+    document.getElementById('seat_input').value = '';
+    document.getElementById('class_input').value = '';
+    document.getElementById('sum-seat').textContent = 'Select a seat';
+    document.getElementById('sum-seat').style.color = 'var(--text-secondary)';
+    document.getElementById('sum-class').textContent = cls;
+    document.getElementById('sum-price').textContent = `₹${price}`;
+    document.getElementById('current-class-label').textContent = cls;
+
+    document.querySelectorAll('.class-tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    buildSeatMap(cls);
+  }
+
+  function validateForm() {
+    if (!selectedSeat) { alert('Please select a seat.'); return false; }
+    return true;
+  }
+
+  function init() {
+    document.getElementById('sum-class').textContent = currentClass;
+    document.getElementById('sum-price').textContent = `₹${classPrices[currentClass] || '—'}`;
+    document.getElementById('current-class-label').textContent = currentClass;
+    buildSeatMap(currentClass);
+  }
+  window.onload = init;
+</script>
+{% endblock %}

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}About — T1CKET{% endblock %}
+
+{% block content %}
+<main class="main-bento-hero" style="background-color: #050505;">
+    <!-- Main Background (Image 1) -->
+    <div class="home-bg" style="background-image: url('{{ url_for('static', filename='images/image_1.png') }}'); opacity: 0.8;"></div>
+
+    <!-- Floating Image 2 -->
+    <div class="annotation top-left draggable" style="flex-direction: column; align-items: flex-start; gap: 12px; top: 15%; left: 10%;">
+        <div style="width: 200px; height: 120px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); background: url('{{ url_for('static', filename='images/image_02.png') }}') center/cover; pointer-events: none;"></div>
+        <div class="text" style="pointer-events: none;">
+            <span class="title">Next-Gen Network</span><br>
+            <span class="price">Global Infrastructure</span>
+        </div>
+    </div>
+
+    <!-- Floating Image 3 -->
+    <div class="annotation mid-right right-side draggable" style="flex-direction: column; align-items: flex-end; gap: 12px; top: 20%; right: 15%;">
+        <div class="text" style="text-align: right; pointer-events: none;">
+            <span class="title">Luxury Interiors</span><br>
+            <span class="price">First Class Booking</span>
+        </div>
+        <div style="width: 240px; height: 160px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); background: url('{{ url_for('static', filename='images/image_03.png') }}') center/cover; pointer-events: none;"></div>
+    </div>
+
+    <!-- Floating Image 4 -->
+    <div class="annotation right-side draggable" style="flex-direction: column; align-items: flex-end; gap: 12px; bottom: 35%; right: 30%;">
+        <div style="width: 180px; height: 180px; border-radius: 16px; overflow: hidden; border: 1px solid rgba(255,255,255,0.2); background: url('{{ url_for('static', filename='images/image_04.png') }}') center/cover; pointer-events: none;"></div>
+        <div class="text" style="text-align: right; pointer-events: none;">
+            <span class="title">Seamless Connect</span><br>
+            <span class="price">High Speed Transit</span>
+        </div>
+    </div>
+
+    <!-- Floating Image 5 (In context box) -->
+    <div class="draggable" style="position: absolute; bottom: 25%; left: 60px; padding: 32px; background: rgba(0,0,0,0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.1); border-radius: 24px; z-index: 10; max-width: 480px; display: flex; gap: 24px; align-items: center;">
+        <div style="width: 120px; height: 120px; border-radius: 16px; flex-shrink: 0; background: url('{{ url_for('static', filename='images/image_05.png') }}') center/cover; pointer-events: none;"></div>
+        <div style="pointer-events: none;">
+            <h1 style="font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 24px; color: #fff; margin-bottom: 12px; letter-spacing: -0.5px;">ABOUT SYSTEM</h1>
+            <p style="font-family: 'Inter', sans-serif; color: #ccc; font-size: 11px; line-height: 1.8; margin-bottom: 8px;">
+                T1CKET is an ACID-compliant booking engine featuring pure concurrency and zero double-booking conditions.
+            </p>
+            <p style="font-family: 'Inter', sans-serif; color: #ccc; font-size: 11px; line-height: 1.8;">
+                Built tightly within an ultra-modern bento-box UX system focusing purely on black and white architectural contrasts.
+            </p>
+        </div>
+    </div>
+
+    <h1 class="hero-headline" style="bottom: 40px; top: auto; left: 60px; font-size: 4rem;">
+        NETWORK,<br>EXPANDED
+    </h1>
+
+    <!-- 'Designed By' Cutout Section -->
+    <div style="position: absolute; bottom: 0; right: 0; width: 140px; height: 110px; background: var(--frame-bg); border-top-left-radius: 20px; display: flex; justify-content: center; align-items: center; z-index: 20; padding-top: 10px; padding-left: 10px; transition: background 0.4s;">
+        <div style="position: absolute; top: -30px; right: 0; width: 30px; height: 30px; box-shadow: 15px 15px 0 15px var(--frame-bg); border-radius: 50%; pointer-events: none; transition: box-shadow 0.4s;"></div>
+        <div style="position: absolute; bottom: 0; left: -30px; width: 30px; height: 30px; box-shadow: 15px 15px 0 15px var(--frame-bg); border-radius: 50%; pointer-events: none; transition: box-shadow 0.4s;"></div>
+
+        <div style="width: 100%; height: 100%; background: var(--text-primary); border-radius: 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border: 1px solid rgba(255,255,255,0.1); transition: background 0.4s;">
+            <div style="font-size: 7px; text-transform: uppercase; letter-spacing: 0.15em; color: var(--frame-bg); font-weight: 600; margin-bottom: 6px; opacity: 0.7;">Designed by</div>
+            <a href="https://paramfolio.vercel.app/" target="_blank" style="font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 11px; line-height: 1.3; color: var(--frame-bg); text-decoration: none;">PARAM<br>MEHTA</a>
+        </div>
+    </div>
+</main>
+{% endblock %}
+
+{% block extra_scripts %}
+<style>
+.draggable { cursor: grab; user-select: none; }
+.draggable:active { cursor: grabbing; }
+</style>
+<script>
+document.querySelectorAll('.draggable').forEach(el => {
+  let isDragging = false, startX, startY, initialX, initialY;
+  el.addEventListener('mousedown', e => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    const rect = el.getBoundingClientRect();
+    const parentRect = el.parentElement.getBoundingClientRect();
+    initialX = rect.left - parentRect.left;
+    initialY = rect.top - parentRect.top;
+    el.style.zIndex = 1000;
+  });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    el.style.left = `${initialX + dx}px`;
+    el.style.top = `${initialY + dy}px`;
+    el.style.bottom = 'auto';
+    el.style.right = 'auto';
+  });
+  window.addEventListener('mouseup', () => {
+    if (isDragging) {
+        isDragging = false;
+        el.style.zIndex = 10;
+    }
+  });
+});
+</script>
+{% endblock %}

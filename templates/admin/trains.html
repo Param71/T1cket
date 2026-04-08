@@ -1,0 +1,76 @@
+{% extends "admin/layout.html" %}
+{% block title %}Manage Trains — T1CKET Admin{% endblock %}
+
+{% block admin_content %}
+<h1 class="admin-page-title">TRAINS</h1>
+<p class="admin-page-subtitle">Add, view and remove trains from the system</p>
+
+<div class="admin-form">
+    <h3>ADD NEW TRAIN</h3>
+    <form method="POST" action="{{ url_for('admin_add_train') }}">
+        <div class="form-row">
+            <div class="field">
+                <label>Train Number</label>
+                <input type="text" name="train_number" placeholder="e.g. 12951" required>
+            </div>
+            <div class="field">
+                <label>Train Name</label>
+                <input type="text" name="train_name" placeholder="e.g. Mumbai Rajdhani" required>
+            </div>
+            <div class="field">
+                <label>Train Type</label>
+                <select name="train_type" required>
+                    <option value="Rajdhani">Rajdhani</option>
+                    <option value="Shatabdi">Shatabdi</option>
+                    <option value="Duronto">Duronto</option>
+                    <option value="Vande Bharat">Vande Bharat</option>
+                    <option value="Express">Express</option>
+                    <option value="Mail">Mail</option>
+                </select>
+            </div>
+            <div class="field">
+                <label>From Station</label>
+                <input type="text" name="from_station" placeholder="e.g. Mumbai" required>
+            </div>
+            <div class="field">
+                <label>To Station</label>
+                <input type="text" name="to_station" placeholder="e.g. New Delhi" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-add">Add Train</button>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Number</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Route</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for t in trains %}
+            <tr>
+                <td>{{ t.train_id }}</td>
+                <td style="font-family:'Orbitron',monospace; font-weight:700;">{{ t.train_number }}</td>
+                <td>{{ t.train_name }}</td>
+                <td>{{ t.train_type }}</td>
+                <td>{{ t.from_station }} → {{ t.to_station }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin_delete_train', train_id=t.train_id) }}" style="display:inline;" onsubmit="return confirm('Delete this train? All schedules and bookings will be removed.');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty-msg">No trains found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

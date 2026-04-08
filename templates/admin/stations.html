@@ -1,0 +1,47 @@
+{% extends "admin/layout.html" %}
+{% block title %}Manage Stations — T1CKET Admin{% endblock %}
+
+{% block admin_content %}
+<h1 class="admin-page-title">STATIONS</h1>
+<p class="admin-page-subtitle">Manage railway station registry</p>
+
+<div class="admin-form">
+    <h3>ADD NEW STATION</h3>
+    <form method="POST" action="{{ url_for('admin_add_station') }}">
+        <div class="form-row">
+            <div class="field">
+                <label>Station Name</label>
+                <input type="text" name="station_name" placeholder="e.g. Jaipur" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-add">Add Station</button>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Station Name</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for s in stations %}
+            <tr>
+                <td>{{ s.station_id }}</td>
+                <td>{{ s.station_name }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('admin_delete_station', station_id=s.station_id) }}" style="display:inline;" onsubmit="return confirm('Remove this station?');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="3" class="empty-msg">No stations found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

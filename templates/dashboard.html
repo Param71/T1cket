@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Dashboard — T1CKET{% endblock %}
+
+{% block extra_head %}
+<style>
+.dashboard-header { margin-bottom: 40px; color: var(--text-primary); }
+.dashboard-header h1 { font-family: 'Syncopate', sans-serif; font-size: 32px; font-weight: 700; }
+.dashboard-header p { font-size: 11px; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; margin-top: 8px; }
+
+.ticket-grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(700px, 1fr)); }
+@media (max-width: 1000px) { .ticket-grid { grid-template-columns: 1fr; } }
+.ticket-card {
+    background: var(--frame-bg); color: var(--text-primary); border-radius: 24px; overflow: hidden; display: flex; position: relative;
+    border: 1px solid var(--input-border);
+}
+.ticket-left { padding: 32px; flex: 1; border-right: 2px dashed var(--input-border); position: relative; }
+.ticket-left::before, .ticket-left::after {
+    content: ''; position: absolute; right: -12px; width: 24px; height: 24px; background: var(--body-bg); border-radius: 50%;
+    z-index: 5;
+}
+.ticket-left::before { top: -12px; }
+.ticket-left::after { bottom: -12px; }
+
+.ticket-right { padding: 32px; width: 240px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: rgba(128,128,128,0.05); }
+.barcode { height: 40px; width: 100%; background: repeating-linear-gradient(90deg, var(--text-primary), var(--text-primary) 2px, transparent 2px, transparent 5px, var(--text-primary) 5px, var(--text-primary) 8px, transparent 8px, transparent 10px); }
+
+.t-header { display: flex; justify-content: space-between; margin-bottom: 24px; align-items: center; }
+.t-brand { font-family: 'Syncopate', sans-serif; font-size: 18px; font-weight: 700; color: var(--text-primary); }
+.t-status { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 600; padding: 4px 10px; border-radius: 12px; border: 1px solid var(--text-primary); }
+
+.t-route { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; }
+.city { font-family: 'Syncopate', sans-serif; font-size: 32px; font-weight: 700; }
+.city span { display: block; font-family: 'Inter', sans-serif; font-size: 10px; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; margin-top: 4px; font-weight: 600; }
+.train-arrow { font-size: 20px; color: var(--text-primary); }
+
+.t-details { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.data-group label { display: block; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px; font-weight: 700; }
+.data-group div { font-size: 14px; font-weight: 600; font-family: 'Inter', sans-serif; }
+
+.train-name { font-size: 14px; font-weight: 600; padding-top: 16px; border-top: 1px solid var(--input-border); display: flex; justify-content: space-between; }
+
+.qr-placeholder { border: 4px solid var(--text-primary); padding: 8px; width: 100px; height: 100px; display: flex; align-items: center; justify-content: center; font-size: 40px; margin-bottom: auto;}
+.pnr { font-family: 'Orbitron', monospace; font-size: 14px; font-weight: 700; letter-spacing: 3px; margin-top: 24px; text-align: center; }
+.empty-state { text-align: center; color: var(--text-secondary); padding: 60px; font-size: 13px; border: 1px dashed rgba(128,128,128,0.2); border-radius: 32px; margin-top: 32px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="main-bento-hero">
+    <div class="scroll-content">
+        <div class="dashboard-header">
+            <h1>WELCOME, {{ username|upper }}</h1>
+            <p>Manage your boarding passes and travel history</p>
+        </div>
+
+        {% if bookings %}
+        <div class="ticket-grid">
+            {% for b in bookings %}
+            <div class="ticket-card">
+                <div class="ticket-left">
+                    <div class="t-header">
+                        <div class="t-brand">T!CKET</div>
+                        <div class="t-status">{{ b.status }}</div>
+                    </div>
+
+                    <div class="t-route">
+                        <div class="city">{{ b.departure_time[:5] }}<span>{{ b.from_station }}</span></div>
+                        <div class="train-arrow"><i class="fa-solid fa-arrow-right-long"></i></div>
+                        <div class="city">{{ b.arrival_time[:5] }}<span>{{ b.to_station }}</span></div>
+                    </div>
+
+                    <div class="t-details">
+                        <div class="data-group">
+                            <label>Date</label>
+                            <div>{{ b.travel_date.strftime('%b %d') if b.travel_date else b.travel_date }}</div>
+                        </div>
+                        <div class="data-group">
+                            <label>Class</label>
+                            <div>{{ b.class }}</div>
+                        </div>
+                        <div class="data-group">
+                            <label>Seat</label>
+                            <div style="font-size: 18px; font-weight: 700;">{{ b.seat_number }}</div>
+                        </div>
+                        <div class="data-group">
+                            <label>Passenger</label>
+                            <div>{{ b.passenger_name }}</div>
+                        </div>
+                    </div>
+
+                    <div class="train-name" style="border-bottom: 1px solid var(--input-border); padding-bottom: 16px; margin-bottom: 16px;">
+                        <span>{{ b.train_name }} ({{ b.train_number }})</span>
+                        <span style="color:var(--text-secondary);">₹{{ "%.0f"|format(b.price) }}</span>
+                    </div>
+                    {% if b.status == 'confirmed' %}
+                    <form action="/cancel_booking/{{ b.booking_id }}" method="POST" onsubmit="return confirm('Are you sure you want to cancel this ticket? Your seat will be returned to the pool immediately.');">
+                        <button type="submit" class="dark-btn" style="background: transparent; color: #ff4444; border: 1px solid #ff4444; width: 100%; border-radius: 12px; font-size: 10px; padding: 8px;">CANCEL TICKET</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="ticket-right">
+                    <div class="qr-placeholder"><i class="fa-solid fa-qrcode"></i></div>
+                    <div style="width: 100%;">
+                        <div class="barcode"></div>
+                        <div class="pnr">PNR{{ b.booking_id }}X</div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h2 style="font-family: 'Syncopate', sans-serif; font-size: 24px; color:var(--text-primary); margin-bottom: 12px;">NO BOARDING PASSES</h2>
+            <p>You haven't booked any trips yet.</p>
+            <a href="/search" class="dark-btn" style="background:var(--text-primary); color:var(--frame-bg); max-width: 200px; margin: 32px auto 0;">Search Trains</a>
+        </div>
+        {% endif %}
+    </div>
+</main>
+{% endblock %}

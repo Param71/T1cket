@@ -1,0 +1,69 @@
+{% extends "admin/layout.html" %}
+{% block title %}Manage Users — T1CKET Admin{% endblock %}
+
+{% block admin_content %}
+<h1 class="admin-page-title">USERS</h1>
+<p class="admin-page-subtitle">Add, view and remove platform users</p>
+
+<div class="admin-form">
+    <h3>ADD NEW USER</h3>
+    <form method="POST" action="{{ url_for('admin_add_user') }}">
+        <div class="form-row">
+            <div class="field">
+                <label>Username</label>
+                <input type="text" name="username" placeholder="e.g. john_doe" required>
+            </div>
+            <div class="field">
+                <label>Email</label>
+                <input type="email" name="email" placeholder="e.g. john@example.com" required>
+            </div>
+            <div class="field">
+                <label>Full Name</label>
+                <input type="text" name="full_name" placeholder="e.g. John Doe" required>
+            </div>
+            <div class="field">
+                <label>Password</label>
+                <input type="password" name="password" placeholder="Set password" required>
+            </div>
+        </div>
+        <button type="submit" class="btn-add">Add User</button>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Full Name</th>
+                <th>Created</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for u in users %}
+            <tr>
+                <td>{{ u.user_id }}</td>
+                <td style="font-family:'Orbitron',monospace; font-weight:600;">@{{ u.username }}</td>
+                <td>{{ u.email }}</td>
+                <td>{{ u.full_name }}</td>
+                <td>{{ u.created_at.strftime('%Y-%m-%d') if u.created_at else '-' }}</td>
+                <td>
+                    {% if u.username != 'admin' %}
+                    <form method="POST" action="{{ url_for('admin_delete_user', user_id=u.user_id) }}" style="display:inline;" onsubmit="return confirm('Delete user @{{ u.username }}? All their bookings will be removed.');">
+                        <button type="submit" class="btn-del">Delete</button>
+                    </form>
+                    {% else %}
+                    <span style="font-size:10px; color:var(--text-secondary);">PROTECTED</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr><td colspan="6" class="empty-msg">No users found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
