@@ -9,28 +9,39 @@ load_dotenv()
 def init_db():
     print("Connecting to MySQL server...")
     try:
-        # Initial connection using flexible fallbacks
+        # Define connection parameters from environment
         host = os.getenv('MYSQLHOST', os.getenv('DB_HOST', 'localhost'))
         user = os.getenv('MYSQLUSER', os.getenv('DB_USER', 'root'))
         password = os.getenv('MYSQLPASSWORD', os.getenv('DB_PASSWORD', ''))
         port = int(os.getenv('MYSQLPORT', 3306))
-        
-        # Check both database variable names
         db_name = os.getenv('MYSQLDATABASE', os.getenv('MYSQL_DATABASE', os.getenv('DB_NAME', 't1cket')))
 
-        conn = mysql.connector.connect(
-            host=host,
-            user=user,
-            password=password,
-            port=port
-        )
+        # 1. Try connecting DIRECTLY to the database first (Preferred for Railway/Cloud)
+        try:
+            conn = mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password,
+                port=port,
+                database=db_name
+            )
+            print(f"Connected directly to database '{db_name}'.")
+        except mysql.connector.Error:
+            # 2. Fallback: Connect to server without DB and try to create it (Expected for Local)
+            print(f"Direct connection to '{db_name}' failed. Attempting to create it...")
+            conn = mysql.connector.connect(
+                host=host,
+                user=user,
+                password=password,
+                port=port
+            )
+            c = conn.cursor()
+            c.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
+            c.execute(f"USE {db_name};")
+            c.close()
+        
         c = conn.cursor()
-        
-        print(f"Ensuring database '{db_name}' exists...")
-        c.execute(f"CREATE DATABASE IF NOT EXISTS {db_name};")
-        c.execute(f"USE {db_name};")
-        
-        print("Creating tables...")
+        print("Creating tables if they don't exist...")
         # 1. users Table
         c.execute('''
         CREATE TABLE IF NOT EXISTS users (
