@@ -1,4 +1,4 @@
-# T!CKET — Railway Ticket Booking Platform
+<img width="2879" height="1799" alt="image" src="https://github.com/user-attachments/assets/397cf075-726c-4e3c-80cc-a8291abdb3e5" /># T!CKET — Railway Ticket Booking Platform
 
 > **A full-stack DBMS project demonstrating ACID-compliant ticket booking with MySQL, Flask, and a premium UI.**
 
@@ -31,6 +31,9 @@
 
 ## Overview
 
+<img width="2879" height="1799" alt="image" src="https://github.com/user-attachments/assets/f6207a7e-860c-4f94-94ea-e79330320fed" />
+
+
 **T!CKET** is a railway ticket booking platform built as a Database Management Systems (DBMS) academic project. It simulates a real-world train reservation system where multiple users can concurrently search for trains, select seats from an interactive seat map, and book tickets — all backed by a **MySQL** relational database that enforces data integrity through normalization, foreign key constraints, and pessimistic concurrency control.
 
 The project goes beyond a simple CRUD application by implementing:
@@ -41,6 +44,8 @@ The project goes beyond a simple CRUD application by implementing:
 - **Database Views** for efficient, reusable query abstraction
 - **Composite indexing** for optimized route and date lookups
 - A complete **Admin Dashboard** for direct SQL-backed entity management
+
+<img width="2879" height="1785" alt="image" src="https://github.com/user-attachments/assets/ea22fd11-b293-4ce5-8958-d225d75addce" />
 
 ---
 
